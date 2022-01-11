@@ -1,0 +1,44 @@
+---
+- name: "Test"
+  hosts: all
+  become: yes 
+  tasks:
+   - name: Install the latest version of Git
+     yum:
+       name: git
+       state: latest
+   
+   - name: Install rbenv
+     git: 
+       repo: "https://github.com/sstephenson/rbenv.git"
+       dest: "~/.rbenv"
+       
+   - name: install rbenv and make pass and read
+     shell:
+       echo: 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+       echo: 'eval "$(rbenv init -)"' >> ~/.bash_profile
+       .bash_profile
+  
+   - name: Install packages required for Ruby 
+     yum: name={{ item }} state=latest
+     with_items:
+       - gcc-c++
+       - zlib-devel
+       - openssl-devel 
+       - ImageMagick-devel
+       - readline-devel
+       - libcurl-devel
+       - libffi-devel
+       - libicu-devel
+       - libxml2-devel
+       - libxslt-devel
+       - python-pip #Install this for ansible
+       
+   - name: pexpectをインストールします。    # 対話形式に答えるためのモジュールです。
+     pip:
+       name: pexpect
+       
+   - name: Install packages for Ruby 
+     git: 
+       repo: "https://github.com/sstephenson/ruby-build.git"
+       dest: "~/.rbenv/plugins/ruby-build"
