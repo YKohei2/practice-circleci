@@ -29,8 +29,7 @@ jobs: #seyhello, aws-cli exampleの順番でjobが実行される
       - checkout
       - aws-cli/setup: #orbsから引っ張て来てセットアップしている
           profile-name: example
-      - run: 
-        - echo "Run your code here"
+      - run: "echo Run your code here"
 
 
 # Invoke jobs via workflows
