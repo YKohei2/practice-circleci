@@ -19,7 +19,7 @@ jobs: #seyhello, aws-cli exampleの順番でjobが実行される
           aws-region: aws_region_1 #環境変数で定義する
       - run: #上記成功すればs3がリストアップされる
           name: "upload CloudFormation" #cloudformationをAWS CLIで実行させる。
-          command: "aws cloudformation create-stack --stack-name testclci --region ap-northeast-1 --template-body file://cftest.yml"
+          command: "aws cloudformation create-stack --stack-name testclci --region ap-northeast-1 --template-body file://my-cloud-formation-practice.yml"
       - run: 
           name: "aws wait stack"
           command: "aws cloudformation wait stack-create-complete --stack-name testclci" #Stacknameはcloudformation createと同じものにする  
