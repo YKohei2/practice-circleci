@@ -1,0 +1,328 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "CloudFormation test" 
+
+#-------------------------------------------------
+Parameters:
+  Keypairdata:
+    Description: Key pair for SSH access to instance 
+    Type: String #最後のKeyNameは固定
+    Default: id_rsa  
+
+  #RDS
+  RDSmasterpw:
+    NoEcho: true
+    Description: pw MySQL access
+    Type: String 
+    Default: cfmysql1
+    MinLength: '8'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]*'
+    
+  DBInstanceName:
+    Type: String
+    Default: "cfrdstest" 
+  MySQLMajorVersion:
+    Type: String
+    Default:  "8.0"
+  MySQLMinorVersion:
+    Type: String
+    Default: "25"
+
+#EC2 instance
+
+  ImageId:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2  #OS???/aws/service/ami-amazon-linux-latest?????Linux????? ) 
+
+#-----------------------------------------------------------------
+      
+Resources: #ここからAWSの定義（リソース）を記述していく
+
+#VPC
+  testCFVPC:
+    Type: "AWS::EC2::VPC" #このリソースの種類
+    Properties: #リソースの細かい設定をこれ以降に記述
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: testCFVPC
+#----------------------------------------------------
+#Subnet
+#Parameters:
+  #Fn::GetAZs: ap-northeast-1a
+  #!GetAZs [1, [!GetAZs !Ref AWS::Region] ]
+  #["ap-northeast-1a", "ap-northeast-1c", "ap-northeast-1d"]
+#Public
+  testCFpubSubnet1a:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref testCFVPC  #ref関数、IDの呼び出し
+      AvailabilityZone: !Select 
+                        - 0
+                        - !GetAZs 
+                          Ref: 'AWS::Region'
+      CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true  #パブリックIPアドレスの自動割り当て
+      Tags:
+        - Key: Name 
+          Value: testCFpubSubnet1a
+ 
+  testCFpubSubnet1c:
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      VpcId: !Ref testCFVPC
+      AvailabilityZone: !Select 
+                        - 1
+                        - !GetAZs 
+                          Ref: 'AWS::Region'
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: testCFpubSubnet1c
+
+#Private 
+ 
+  testCFprvSubnet1a:
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      VpcId: !Ref testCFVPC
+      AvailabilityZone: !Select
+                        - 0
+                        - !GetAZs 
+                          Ref: 'AWS::Region'               
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: testCFprvSubnet1a
+
+  testCFprvSubnet1c:
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      VpcId: !Ref testCFVPC
+      AvailabilityZone: !Select
+                        - 1
+                        - !GetAZs 
+                          Ref: 'AWS::Region'
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: false
+      Tags: 
+        - Key: Name
+          Value: testCFprvSubnet1c
+
+#subnet group
+  cfsubgroup:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupName: cfdbsubgroup
+      DBSubnetGroupDescription: cfdbsubgroup
+      SubnetIds: 
+        - !Ref testCFprvSubnet1a
+        - !Ref testCFprvSubnet1c     
+ 
+#----------------------------------------------
+#Internet Gateway
+
+  cfig:
+    Type: "AWS::EC2::InternetGateway"
+    Properties:
+      Tags: 
+        - Key: Name
+          Value: cfig
+#----------------------------------------------
+#Internet Gateway attach
+
+  internetgatewayattach:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      InternetGatewayId: !Ref cfig
+      VpcId: !Ref testCFVPC
+#----------------------------------------------
+# Route Table
+
+  cfPublicRT:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref testCFVPC
+      Tags: 
+        - Key: Name
+          Value: cfPublicRT
+
+  cfPrivateRT:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref testCFVPC
+      Tags:
+        - Key: Name
+          Value: cfPrivateRT
+
+#----------------------------------------------
+#Route
+
+  CFRoutePublic:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref cfPublicRT
+      DestinationCidrBlock: 0.0.0.0/0 #送信先
+      GatewayId: !Ref cfig
+
+  #privateのデフォルトでプライベートの送信先が設定されているのでルートは記載しない？
+
+#-----------------------------------------------
+#Associating Public subnet and Route table
+
+  PublicsubaRouteTAssCF:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref testCFpubSubnet1a
+      RouteTableId: !Ref cfPublicRT
+
+  PublicsubcRouteTAssCF:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref testCFpubSubnet1c
+      RouteTableId: !Ref cfPublicRT
+
+  PrivatesubaRouteTAssCF:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref testCFprvSubnet1a
+      RouteTableId: !Ref cfPrivateRT
+
+  PrivatesubcRouteTAssCF:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref testCFprvSubnet1c
+      RouteTableId: !Ref cfPrivateRT
+#----------------------------------------------
+#インスタンス
+#EC2
+  CfLinuxInstance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: !Ref ImageId
+      InstanceType: t2.small
+      AvailabilityZone: !Select
+                        - 0
+                        - !GetAZs 
+                          Ref: 'AWS::Region'
+      SubnetId: !Ref testCFpubSubnet1a
+      SecurityGroupIds:  
+        - !Ref cfwebSecurityGroup  
+      KeyName: !Ref Keypairdata #Keypair
+      tag:
+        - Key: Name
+          Value: cfinstance-test
+
+#Database
+  cfrdsinstancetest:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      DBInstanceIdentifier: !Ref DBInstanceName
+      Engine: mysql
+      EngineVersion: !Sub "${MySQLMajorVersion}.${MySQLMinorVersion}" 
+      DBInstanceClass: db.t2.micro
+      AllocatedStorage: 20
+      StorageType: gp2
+      DBName: db
+      MasterUsername: Admin
+      MasterUserPassword: !Ref RDSmasterpw
+      DBSubnetGroupName: !Ref cfsubgroup 
+      PubliclyAccessible: false #true????internetface????????IP????????false????internal?????????
+      AvailabilityZone: !Select
+                        - 1
+                        - !GetAZs 
+                          Ref: 'AWS::Region' 
+      AutoMinorVersionUpgrade: true #???????????????????
+      VPCSecurityGroups: 
+        - !Ref cfrdsSecurityGroup
+      CopyTagsToSnapshot: true
+      BackupRetentionPeriod: 7 #????????????????
+      #DBSecurityGroups: 
+        #- !Ref cfrdsSecurityGroup
+      Tags:
+        - Key: Name
+          Value: cfrdsinstancetest
+
+        
+#--------------------------------------------
+  #Security Group
+
+  cfwebSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties: 
+      GroupDescription: cfwebSecurityGroup 
+      GroupName: cfwebSecurityGroup
+      VpcId: !Ref testCFVPC 
+      SecurityGroupIngress:
+        -  IpProtocol: tcp
+           FromPort: 80
+           ToPort: 80
+           CidrIp: 0.0.0.0/0  
+        -  IpProtocol: tcp
+           FromPort: 3000
+           ToPort: 3000
+           CidrIp: 0.0.0.0/0
+        -  IpProtocol: tcp
+           FromPort: 22
+           ToPort: 22
+           CidrIp: 113.153.64.12/32
+        -  IpProtocol: tcp
+           FromPort: 22
+           ToPort: 22
+           CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: cfwebSecurityGroup
+
+        #-  IpProtocol: tcp
+           #FromPort: 80
+           #ToPort: 80
+           #CidrIp: ::/0
+           #SecurityGroupEgress（アウトバウンドルール）は設定しなくてもデフォルトですべての通信が可能
+
+  cfrdsSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup" 
+    Properties:
+      GroupDescription: cfrdsSecurityGroup
+      GroupName: cfrdsSecurityGroup 
+      VpcId: !Ref testCFVPC
+      SecurityGroupIngress:
+         -  IpProtocol: tcp 
+            FromPort: 3306
+            ToPort: 3306
+            SourceSecurityGroupId: !Ref cfwebSecurityGroup
+      Tags:
+        - Key: Name
+          Value: cfrdsSecurityGroup   
+
+Outputs:
+  VPCid:
+    Value: !Ref testCFVPC        
+    Export:  
+      Name: VPCid
+
+  TargetEC:
+    Value: !Ref CfLinuxInstance
+    Export:
+      Name: TargetEC  
+
+  LBsubnet1a:
+    Value: !Ref testCFpubSubnet1a
+    Export:
+      Name: LBsubnet1a
+
+  LBsubnet1c:
+    Value: !Ref testCFpubSubnet1c
+    Export:
+      Name: LBsubnet1c    
+
+  LBLinuxInstance:
+    Value: !Ref CfLinuxInstance
+    Export:
+      Name: LBLinuxInstance
+
+        
