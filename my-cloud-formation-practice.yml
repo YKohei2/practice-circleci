@@ -213,6 +213,9 @@ Resources: #ここからAWSの定義（リソース）を記述していく
       SecurityGroupIds:  
         - !Ref cfwebSecurityGroup  
       KeyName: !Ref Keypairdata #Keypair
+      tag:
+        - Key: Name
+          Value: cfinstance-test
 
 #Database
   cfrdsinstancetest:
