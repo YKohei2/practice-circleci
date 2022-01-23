@@ -20,6 +20,9 @@ jobs: #seyhello, aws-cli exampleの順番でjobが実行される
       - run: 
           name: "upload CloudFormation" #cloudformationをAWS CLIで実行させる。
           command: "aws cloudformation create-stack --stack-name testclci --region ap-northeast-1 --template-body file://my-cloud-formation-practice.yml"
+      - run: 
+          name: "aws wait stack"
+          command: "aws cloudformation wait stack-create-complete --stack-name testclci"
       - run:
           name: "upload cf-loadbalancer"
           command: "aws cloudformation create-stack --stack-name testcflb --region ap-northeast-1 --template-body file://my-LoadBalancer-cloud_formation_practice.yml"
