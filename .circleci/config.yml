@@ -19,10 +19,10 @@ jobs: #seyhello, aws-cli exampleの順番でjobが実行される
           aws-region: aws_region_1 #環境変数で定義する
       - run: #上記成功すればs3がリストアップされる
           name: "upload CloudFormation" #cloudformationをAWS CLIで実行させる。
-          command: "aws cloudformation create-stack --stack-name test-clci --region ap-northeast-1 --template-body file://cf_pipeline.yml"
+          command: "aws cloudformation create-stack --stack-name test-clci --region ap-northeast-1 --template-body file://cfPipeline.yml"
       - run: 
           name: "aws wait stack"
-          command: "aws cloudformation wait stack-create-complete \ --stack-name cf_waitstack"  
+          command: "aws cloudformation wait stack-create-complete --stack-name cf_waitstack"  
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
