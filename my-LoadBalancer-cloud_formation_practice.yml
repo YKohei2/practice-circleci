@@ -84,7 +84,7 @@ Resources:
       HealthCheckTimeoutSeconds: 5  #レスポンスが何もないときに何秒でタイムアウトするか
       HealthyThresholdCount: 5  #何回成功が続いたらhealthyと判断するか
       Matcher: 
-        HttpCode: 200 #どのコードを使ってhealth checkを確認するか
+        HttpCode: 200 #どのコードを使ってhealth checkを確認するか。
       Name: cfALBTargetGroup  #ターゲットグループの名前。
       Port: 80 #for route traffic
       Protocol: HTTP #for route traffic

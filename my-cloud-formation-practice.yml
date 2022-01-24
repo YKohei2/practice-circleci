@@ -64,7 +64,7 @@ Resources: #ここからAWSの定義（リソース）を記述していく
                         - !GetAZs 
                           Ref: 'AWS::Region'
       CidrBlock: 10.0.0.0/24
-      MapPublicIpOnLaunch: true  #パブリックIPアドレスの自動割り当て
+      MapPublicIpOnLaunch: true  #パブリックIPアドレスの自動割り当て。
       Tags:
         - Key: Name 
           Value: testCFpubSubnet1a
