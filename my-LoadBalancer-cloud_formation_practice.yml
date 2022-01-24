@@ -1,4 +1,3 @@
-
 AWSTemplateFormatVersion: "2010-09-09"      
 
 Resources:
@@ -85,8 +84,8 @@ Resources:
       HealthCheckTimeoutSeconds: 5  #レスポンスが何もないときに何秒でタイムアウトするか
       HealthyThresholdCount: 5  #何回成功が続いたらhealthyと判断するか
       Matcher: 
-        HttpCode: 200 #どのコードを使ってhealth checkを確認するか
-      Name: cfALBTargetGroup  #ターゲットグループの名前
+        HttpCode: 200 #どのコードを使ってhealth checkを確認するか。
+      Name: cfALBTargetGroup  #ターゲットグループの名前。
       Port: 80 #for route traffic
       Protocol: HTTP #for route traffic
       TargetType:  instance
@@ -99,7 +98,17 @@ Resources:
         - Key: Name 
           Value: cfALBTarget  
 
-          
+#-----------------------------------------------------------------
+#Elastic IP
+  MytestEIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+      InstanceId: !ImportValue LBLinuxInstance
+      #PublicIpv4Pool: 10.0.0.80
+      Tags: 
+        - Key: Name
+          Value: MytestEIP
 
 
      

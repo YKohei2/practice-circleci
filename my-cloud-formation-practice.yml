@@ -64,7 +64,7 @@ Resources: #ここからAWSの定義（リソース）を記述していく
                         - !GetAZs 
                           Ref: 'AWS::Region'
       CidrBlock: 10.0.0.0/24
-      MapPublicIpOnLaunch: true  #パブリックIPアドレスの自動割り当て
+      MapPublicIpOnLaunch: true  #パブリックIPアドレスの自動割り当て。
       Tags:
         - Key: Name 
           Value: testCFpubSubnet1a
@@ -213,9 +213,9 @@ Resources: #ここからAWSの定義（リソース）を記述していく
       SecurityGroupIds:  
         - !Ref cfwebSecurityGroup  
       KeyName: !Ref Keypairdata #Keypair
-      tag:
+      Tags:
         - Key: Name
-          Value: cfinstance-test
+          Value: CFLinuxInstance
 
 #Database
   cfrdsinstancetest:
@@ -282,7 +282,7 @@ Resources: #ここからAWSの定義（リソース）を記述していく
            #FromPort: 80
            #ToPort: 80
            #CidrIp: ::/0
-           #SecurityGroupEgress（アウトバウンドルール）は設定しなくてもデフォルトですべての通信が可能
+           #SecurityGroupEgress（アウトバウンドルール）は設定しなくてもデフォルトですべての通信が可能。
 
   cfrdsSecurityGroup:
     Type: "AWS::EC2::SecurityGroup" 
@@ -305,11 +305,6 @@ Outputs:
     Export:  
       Name: VPCid
 
-  TargetEC:
-    Value: !Ref CfLinuxInstance
-    Export:
-      Name: TargetEC  
-
   LBsubnet1a:
     Value: !Ref testCFpubSubnet1a
     Export:
@@ -325,4 +320,6 @@ Outputs:
     Export:
       Name: LBLinuxInstance
 
+
+        
         
