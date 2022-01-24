@@ -105,7 +105,7 @@ Resources:
     Properties:
       Domain: vpc
       InstanceId: !ImportValue LBLinuxInstance
-      PublicIpv4Pool: 10.0.0.80
+      #PublicIpv4Pool: 10.0.0.80
       Tags: 
         - Key: Name
           Value: MytestEIP
