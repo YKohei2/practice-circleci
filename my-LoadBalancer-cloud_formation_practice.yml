@@ -1,4 +1,3 @@
-
 AWSTemplateFormatVersion: "2010-09-09"      
 
 Resources:
@@ -99,7 +98,17 @@ Resources:
         - Key: Name 
           Value: cfALBTarget  
 
-          
+#-----------------------------------------------------------------
+#Elastic IP
+  MytestEIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+      InstanceId: !ImportValue CFLinuxInstance
+      PublicIpv4Pool: 10.0.0.80
+      Tags: 
+        - Key: Name
+          Value: MytestEIP
 
 
      

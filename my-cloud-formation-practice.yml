@@ -213,9 +213,9 @@ Resources: #ここからAWSの定義（リソース）を記述していく
       SecurityGroupIds:  
         - !Ref cfwebSecurityGroup  
       KeyName: !Ref Keypairdata #Keypair
-      tag:
+      Tags:
         - Key: Name
-          Value: cfinstance-test
+          Value: CFLinuxInstance
 
 #Database
   cfrdsinstancetest:
@@ -305,11 +305,6 @@ Outputs:
     Export:  
       Name: VPCid
 
-  TargetEC:
-    Value: !Ref CfLinuxInstance
-    Export:
-      Name: TargetEC  
-
   LBsubnet1a:
     Value: !Ref testCFpubSubnet1a
     Export:
@@ -325,4 +320,6 @@ Outputs:
     Export:
       Name: LBLinuxInstance
 
+
+        
         
