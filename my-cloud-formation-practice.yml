@@ -282,7 +282,7 @@ Resources: #ここからAWSの定義（リソース）を記述していく
            #FromPort: 80
            #ToPort: 80
            #CidrIp: ::/0
-           #SecurityGroupEgress（アウトバウンドルール）は設定しなくてもデフォルトですべての通信が可能
+           #SecurityGroupEgress（アウトバウンドルール）は設定しなくてもデフォルトですべての通信が可能。
 
   cfrdsSecurityGroup:
     Type: "AWS::EC2::SecurityGroup" 
