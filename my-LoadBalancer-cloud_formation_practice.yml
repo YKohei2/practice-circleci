@@ -104,7 +104,7 @@ Resources:
     Type: "AWS::EC2::EIP"
     Properties:
       Domain: vpc
-      InstanceId: !ImportValue CFLinuxInstance
+      InstanceId: !ImportValue LBLinuxInstance
       PublicIpv4Pool: 10.0.0.80
       Tags: 
         - Key: Name
