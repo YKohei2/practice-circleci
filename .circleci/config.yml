@@ -30,7 +30,7 @@ jobs: #seyhello, aws-cli exampleの順番でjobが実行される
           name: "awslb wait stack"
           command: "aws cloudformation wait stack-create-complete --stack-name testcflb"
           
-  deploy:
+  ansible:
     machine:
       image: circleci/classic:edge
     steps:
@@ -45,6 +45,6 @@ workflows:
    # jobs: 
     #  - aws-cli-example
   
-  ansible:
+  ansible: #workflowの名前は上記のjobsと同じ名前にする。
     jobs:
       - ansible
