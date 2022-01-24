@@ -30,21 +30,21 @@ jobs: #seyhello, aws-cli exampleの順番でjobが実行される
           name: "awslb wait stack"
           command: "aws cloudformation wait stack-create-complete --stack-name testcflb"
           
-  #ansible:
-    #steps:
-     # - checkout
-      #- add_ssh_keys
-      #- run: 
-       #   name: "Connct Crcle ci and ssh and echo hello"
-        #  run: ssh ${CIRCLE_EC2_USER}@${52.197.241.26} 'echo Hello'
+  ansible:
+    steps:
+      - checkout
+      - add_ssh_keys
+      - run: 
+          name: "Connct Crcle ci and ssh and echo hello"
+          run: ssh ${CIRCLE_EC2_USER}@${52.197.241.26} 'echo Hello'
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  aws-cli-workflow:
-    jobs: 
-      - aws-cli-example
+  #aws-cli-workflow:
+   # jobs: 
+    #  - aws-cli-example
   
-  #ansible:
-    #jobs:
-     # - ansible
+  ansible:
+    jobs:
+      - ansible
