@@ -43,7 +43,7 @@ jobs: #seyhello, aws-cli exampleの順番でjobが実行される
           command: ssh ${USER_NAME}@${HOST_NAME} 'Hello World'
 
 # Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows.
 workflows:
   #aws-cli-workflow:
    # jobs: 
