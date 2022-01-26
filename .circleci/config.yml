@@ -45,10 +45,10 @@ jobs: #seyhello, aws-cli exampleの順番でjobが実行される
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  #aws-cli-workflow:
-   # jobs: 
-    #  - aws-cli-example
+  aws-cli-workflow:
+    jobs: 
+      - aws-cli-example
   
-  ansible: #workflowの名前は上記のjobsと同じ名前にする。
-    jobs:
-      - ansible
+  #ansible: #workflowの名前は上記のjobsと同じ名前にする。
+    #jobs:
+      #- ansible
