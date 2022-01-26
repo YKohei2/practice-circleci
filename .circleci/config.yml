@@ -49,6 +49,6 @@ workflows:
    # jobs: 
     #  - aws-cli-example
   
-  ansible: #workflowの名前は上記のjobsと同じ名前にする。
+  ansible: #workflowの名前は上記のjobsと同じ名前にする
     jobs:
       - ansible
