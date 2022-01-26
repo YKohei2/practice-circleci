@@ -40,15 +40,15 @@ jobs: #seyhello, aws-cli exampleの順番でjobが実行される
             - "12:2f:10:58:80:65:51:cf:fe:d9:a7:3e:0b:50:f8:49"
       - run: 
           name: "connect SSH Key"
-          command: ssh ${CIRCLE_EC2_USER}@${HOST_NAME} 'Hello World'
+          command: ssh ${USER_NAME}@${HOST_NAME} 'Hello World'
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  aws-cli-workflow:
-    jobs: 
-      - aws-cli-example
+  #aws-cli-workflow:
+   # jobs: 
+    #  - aws-cli-example
   
-  #ansible: #workflowの名前は上記のjobsと同じ名前にする。
-    #jobs:
-      #- ansible
+  ansible: #workflowの名前は上記のjobsと同じ名前にする。
+    jobs:
+      - ansible
